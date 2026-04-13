@@ -1,0 +1,31 @@
+{
+  "name": "portefolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio React/Vite avec backend Express et SQLite.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js",
+    "serve": "npm run build && npm start"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "lucide-react": "^0.499.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sqlite": "^5.1.0",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.37",
+    "tailwindcss": "^3.4.5",
+    "vite": "^5.4.1"
+  }
+}

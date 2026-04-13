@@ -1,0 +1,535 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Monitor, 
+  Smartphone, 
+  PenTool, 
+  ShoppingCart, 
+  ChevronRight, 
+  Menu, 
+  X, 
+  Mail, 
+  CheckCircle2,
+  ExternalLink,
+  Code,
+  Phone,
+  MessageCircle,
+  MessageSquare
+} from 'lucide-react';
+
+export default function App() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState('Site Vitrine');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitStatus, setSubmitStatus] = useState({ status: 'idle', message: '' });
+  const API_URL = 'http://localhost:4000';
+
+  const colors = {
+    primary: '#1da1b5', 
+    secondary: '#f2cb1f', 
+    dark: '#232220', 
+    light: '#fbfaf3',
+    whatsapp: '#25D366'
+  };
+
+  const contactInfo = {
+    whatsapp: '0845370370',
+    call: '0836104745',
+    email: 'Alphagiven7@gmail.com'
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => {
+    setMobileMenuOpen(false);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleOrder = (serviceName) => {
+    setSelectedService(serviceName);
+    scrollToSection('contact');
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setSubmitStatus({ status: 'error', message: 'Merci de remplir tous les champs avant d’envoyer.' });
+      return;
+    }
+
+    setSubmitStatus({ status: 'loading', message: 'Envoi en cours…' });
+    try {
+      const response = await fetch(`${API_URL}/api/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          service: selectedService,
+          message: formData.message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur serveur');
+      }
+
+      setSubmitStatus({ status: 'success', message: 'Message envoyé et sauvegardé en base de données.' });
+      setFormData({ name: '', email: '', message: '' });
+      setSelectedService('Site Vitrine');
+    } catch (error) {
+      setSubmitStatus({ status: 'error', message: 'Impossible d’envoyer le message. Vérifiez que le serveur est démarré.' });
+    }
+  };
+
+  return (
+    <div className="font-sans text-gray-800 bg-[#fbfaf3] min-h-screen relative">
+      
+      {/* Bouton Flottant WhatsApp */}
+      <a 
+        href={`https://wa.me/${contactInfo.whatsapp.replace(/\s/g, '')}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-[100] p-4 rounded-full shadow-2xl transition-transform hover:scale-110 flex items-center justify-center animate-bounce hover:animate-none"
+        style={{ backgroundColor: colors.whatsapp, color: 'white' }}
+        title="Contactez-nous sur WhatsApp"
+      >
+        <MessageCircle size={32} />
+      </a>
+
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center cursor-pointer" onClick={() => scrollToSection('accueil')}>
+              <span className="text-2xl font-black tracking-tighter" style={{ color: colors.dark }}>
+                ALPHA<span style={{ color: colors.primary }}>DESIGN</span>
+              </span>
+            </div>
+            
+            <div className="hidden md:flex space-x-8 items-center">
+              {['Accueil', 'Pour Qui', 'Services', 'Portfolio'].map((item) => (
+                <button 
+                  key={item}
+                  onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
+                  className="text-sm font-semibold hover:text-[#1da1b5] transition-colors"
+                >
+                  {item}
+                </button>
+              ))}
+              <button 
+                onClick={() => scrollToSection('contact')}
+                className="px-6 py-2 rounded-full text-white font-bold transition-transform hover:scale-105 shadow-lg"
+                style={{ backgroundColor: colors.primary }}
+              >
+                Me Contacter
+              </button>
+            </div>
+
+            <div className="md:hidden flex items-center">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white absolute top-full left-0 w-full shadow-xl flex flex-col py-4 px-6 space-y-4">
+             {['Accueil', 'Pour Qui', 'Services', 'Portfolio', 'Contact'].map((item) => (
+                <button 
+                  key={item}
+                  onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
+                  className="text-left font-semibold text-lg py-2 border-b border-gray-100"
+                >
+                  {item}
+                </button>
+              ))}
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section id="accueil" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden" style={{ backgroundColor: colors.primary }}>
+        <div className="absolute top-[-10%] left-[-5%] w-64 h-64 rounded-full border-[20px] opacity-20 pointer-events-none" style={{ borderColor: colors.secondary }}></div>
+        <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 rounded-full border-[30px] opacity-20 pointer-events-none" style={{ borderColor: colors.secondary }}></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="w-full lg:w-1/2 text-white">
+              <div className="inline-block px-4 py-1 rounded-full text-sm font-bold mb-6" style={{ backgroundColor: colors.dark, color: colors.secondary }}>
+                WEB DESIGN & DÉVELOPPEMENT
+              </div>
+              <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight mb-6">
+                Besoin d'un <br/>
+                <span style={{ color: colors.secondary }}>Site Web ?</span>
+              </h1>
+              <p className="text-xl lg:text-2xl font-medium mb-8 opacity-90">
+                NOUS CRÉONS VOTRE PRÉSENCE EN LIGNE !
+                <br className="hidden lg:block"/> Sites modernes, applications mobiles et identité visuelle sur-mesure.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={() => scrollToSection('contact')}
+                  className="px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all hover:-translate-y-1 shadow-xl"
+                  style={{ backgroundColor: colors.dark, color: 'white' }}
+                >
+                  Commander un projet <ChevronRight size={20} />
+                </button>
+                <a 
+                  href={`https://wa.me/${contactInfo.whatsapp.replace(/\s/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 rounded-full font-bold text-lg border-2 flex items-center justify-center gap-2 transition-all hover:bg-white hover:text-[#1da1b5]"
+                  style={{ borderColor: 'white', color: 'white' }}
+                >
+                  <MessageCircle size={20} /> WhatsApp
+                </a>
+              </div>
+            </div>
+            <div className="w-full lg:w-1/2 relative">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl transform lg:rotate-3 transition-transform hover:rotate-0 duration-500">
+                <img 
+                  src="images/hero.jpg" 
+                  alt="Espace de travail Web Design" 
+                  className="w-full h-[400px] object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg flex items-center gap-4">
+                    <div className="p-3 rounded-full" style={{ backgroundColor: colors.primary, color: 'white' }}>
+                      <Code size={24} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">Conception 100% autonome</p>
+                      <p className="text-sm text-gray-600">Sur-mesure et optimisée</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Target Audience Section */}
+      <section id="pour-qui" className="py-20" style={{ backgroundColor: colors.light }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black mb-4" style={{ color: colors.primary }}>POUR QUI ?</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Des solutions digitales adaptées à chaque profil et chaque ambition.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {[
+              { title: "Vous êtes Commerçant", subtitle: "(Vendez en ligne)", desc: "Élargissez votre clientèle avec une boutique en ligne performante." },
+              { title: "Vous êtes Entrepreneur", subtitle: "(Soyez crédible)", desc: "Une vitrine professionnelle pour attirer et rassurer vos prospects." },
+              { title: "Vous êtes une Entreprise", subtitle: "(Automatisez vos outils)", desc: "Des applications web sur-mesure pour optimiser votre gestion." },
+              { title: "Vous avez une Idée", subtitle: "(Créez votre App)", desc: "Donnez vie à votre concept avec une application mobile moderne." }
+            ].map((item, index) => (
+              <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 flex items-start gap-4">
+                <div className="mt-1">
+                  <CheckCircle2 size={28} style={{ color: colors.primary }} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold" style={{ color: colors.dark }}>
+                    {item.title} <br/>
+                    <span style={{ color: colors.primary }} className="text-xl">{item.subtitle}</span>
+                  </h3>
+                  <p className="mt-2 text-gray-600 font-medium">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-24 text-white" style={{ backgroundColor: colors.dark }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black mb-4">Mes Services</h2>
+            <div className="w-24 h-1 mx-auto rounded" style={{ backgroundColor: colors.secondary }}></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="p-6 rounded-2xl border border-gray-700 hover:border-[#1da1b5] transition-colors group flex flex-col h-full">
+              <div className="flex-grow">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(29, 161, 181, 0.2)', color: colors.primary }}>
+                  <Monitor size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Sites Vitrines</h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                  Présentez votre activité avec un site professionnel et moderne.
+                </p>
+              </div>
+              <button onClick={() => handleOrder('Site Vitrine')} className="mt-auto w-full py-3 rounded-lg font-bold text-sm transition-all bg-white/5 hover:bg-[#1da1b5] hover:text-white" style={{ color: colors.primary }}>
+                Commander ce service
+              </button>
+            </div>
+
+            <div className="p-6 rounded-2xl border border-gray-700 hover:border-[#f2cb1f] transition-colors group flex flex-col h-full">
+              <div className="flex-grow">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(242, 203, 31, 0.2)', color: colors.secondary }}>
+                  <ShoppingCart size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">E-Commerce</h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                  Vendez vos produits avec une boutique sécurisée.
+                </p>
+              </div>
+              <button onClick={() => handleOrder('Site E-Commerce')} className="mt-auto w-full py-3 rounded-lg font-bold text-sm transition-all bg-white/5 hover:bg-[#f2cb1f] hover:text-gray-900" style={{ color: colors.secondary }}>
+                Commander ce service
+              </button>
+            </div>
+
+            <div className="p-6 rounded-2xl border border-gray-700 hover:border-[#1da1b5] transition-colors group flex flex-col h-full">
+              <div className="flex-grow">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(29, 161, 181, 0.2)', color: colors.primary }}>
+                  <Smartphone size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Applications</h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                  Outils sur-mesure pour automatiser votre business.
+                </p>
+              </div>
+              <button onClick={() => handleOrder('Application Web / Mobile')} className="mt-auto w-full py-3 rounded-lg font-bold text-sm transition-all bg-white/5 hover:bg-[#1da1b5] hover:text-white" style={{ color: colors.primary }}>
+                Commander ce service
+              </button>
+            </div>
+
+            <div className="p-6 rounded-2xl border border-gray-700 hover:border-[#f2cb1f] transition-colors group flex flex-col h-full">
+              <div className="flex-grow">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(242, 203, 31, 0.2)', color: colors.secondary }}>
+                  <PenTool size={32} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Design Graphique</h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                  Affiches, logos, flyers pour vous démarquer.
+                </p>
+              </div>
+              <button onClick={() => handleOrder('Design Graphique')} className="mt-auto w-full py-3 rounded-lg font-bold text-sm transition-all bg-white/5 hover:bg-[#f2cb1f] hover:text-gray-900" style={{ color: colors.secondary }}>
+                Commander ce service
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio Section */}
+      <section id="portfolio" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-black mb-4" style={{ color: colors.dark }}>Ma Réalisation Phare</h2>
+            <p className="text-lg text-gray-500">Un projet illustrant mon expertise.</p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
+              <div className="h-80 md:h-96 bg-gray-200 overflow-hidden">
+                <img 
+                  src="images/calures.jpg" 
+                  alt="Bibliothèque Numérique Calures.org" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-8 text-white">
+                <span className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: colors.secondary }}>
+                  Bibliothèque Numérique
+                </span>
+                <h3 className="text-3xl md:text-4xl font-bold mb-3">Calures.org</h3>
+                <p className="text-gray-200 mb-6 max-w-2xl">
+                  Accès fluide aux ressources documentaires et au savoir.
+                </p>
+                <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+                  <ExternalLink size={18} /> Voir le projet
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20" style={{ backgroundColor: colors.light }}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-3xl shadow-xl overflow-hidden">
+          <div className="flex flex-col md:flex-row">
+            <div className="w-full md:w-2/5 p-10 text-white flex flex-col justify-between" style={{ backgroundColor: colors.primary }}>
+              <div>
+                <h2 className="text-3xl font-black mb-4">Prêt à démarrer ?</h2>
+                <p className="opacity-90 mb-8 text-sm leading-relaxed">
+                  Discutons de votre projet par le moyen qui vous convient le mieux.
+                </p>
+                
+                <div className="space-y-6">
+                  {/* WhatsApp Info */}
+                  <a 
+                    href={`https://wa.me/${contactInfo.whatsapp.replace(/\s/g, '')}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 group hover:translate-x-2 transition-transform"
+                  >
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 group-hover:bg-[#25D366]">
+                      <MessageCircle size={22} />
+                    </div>
+                    <div>
+                      <p className="text-xs opacity-70 uppercase font-bold">WhatsApp</p>
+                      <p className="font-bold text-lg">{contactInfo.whatsapp}</p>
+                    </div>
+                  </a>
+
+                  {/* Call Info */}
+                  <a 
+                    href={`tel:${contactInfo.call.replace(/\s/g, '')}`} 
+                    className="flex items-center gap-4 group hover:translate-x-2 transition-transform"
+                  >
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 group-hover:bg-white/40">
+                      <Phone size={22} />
+                    </div>
+                    <div>
+                      <p className="text-xs opacity-70 uppercase font-bold">Appel & Message</p>
+                      <p className="font-bold text-lg">{contactInfo.call}</p>
+                    </div>
+                  </a>
+
+                  {/* Email Info */}
+                  <a 
+                    href={`mailto:${contactInfo.email}`} 
+                    className="flex items-center gap-4 group hover:translate-x-2 transition-transform"
+                  >
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 group-hover:bg-white/40">
+                      <Mail size={22} />
+                    </div>
+                    <div>
+                      <p className="text-xs opacity-70 uppercase font-bold">Email</p>
+                      <p className="font-bold">{contactInfo.email}</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              
+              <div className="mt-12 pt-6 border-t border-white/20">
+                <p className="text-xs font-bold uppercase tracking-widest opacity-60">AlphaDesign Agency</p>
+              </div>
+            </div>
+
+            <div className="w-full md:w-3/5 p-10">
+              <h3 className="text-2xl font-bold mb-6" style={{ color: colors.dark }}>Envoyez un message</h3>
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Nom</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#1da1b5] focus:ring-2 focus:ring-[#1da1b5]/20 outline-none transition-all"
+                      placeholder="Votre nom"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#1da1b5] focus:ring-2 focus:ring-[#1da1b5]/20 outline-none transition-all"
+                      placeholder="votre@email.com"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Type de projet</label>
+                  <select
+                    value={selectedService}
+                    onChange={(e) => setSelectedService(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#1da1b5] focus:ring-2 focus:ring-[#1da1b5]/20 outline-none transition-all bg-white"
+                  >
+                    <option value="Site Vitrine">Site Vitrine</option>
+                    <option value="Site E-Commerce">Site E-Commerce</option>
+                    <option value="Application Web / Mobile">Application Web / Mobile</option>
+                    <option value="Design Graphique">Design Graphique</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Message</label>
+                  <textarea
+                    rows="4"
+                    value={formData.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#1da1b5] focus:ring-2 focus:ring-[#1da1b5]/20 outline-none transition-all resize-none"
+                    placeholder="Décrivez votre besoin..."
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  disabled={submitStatus.status === 'loading'}
+                  className="w-full py-4 rounded-xl font-bold text-white transition-all hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: colors.dark }}
+                >
+                  {submitStatus.status === 'loading' ? 'Envoi...' : 'Envoyer le message'} <MessageSquare size={18} />
+                </button>
+                {submitStatus.message && (
+                  <p className={`text-sm font-semibold ${submitStatus.status === 'success' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {submitStatus.message}
+                  </p>
+                )}
+                <div className="relative flex items-center py-4">
+                  <div className="flex-grow border-t border-gray-200"></div>
+                  <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase font-bold">Ou via</span>
+                  <div className="flex-grow border-t border-gray-200"></div>
+                </div>
+                <a 
+                  href={`https://wa.me/${contactInfo.whatsapp.replace(/\s/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-4 rounded-xl font-bold text-white transition-all hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2" 
+                  style={{ backgroundColor: colors.whatsapp }}
+                >
+                  Contacter sur WhatsApp <MessageCircle size={18} />
+                </a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 text-center text-gray-400 text-sm" style={{ backgroundColor: colors.dark }}>
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-left">
+            <span className="text-xl font-black tracking-tighter text-white">
+              ALPHA<span style={{ color: colors.primary }}>DESIGN</span>
+            </span>
+            <p className="mt-2">Expert en solutions digitales sur-mesure.</p>
+          </div>
+          <div className="flex flex-col md:flex-row gap-8 items-center">
+            <div className="flex flex-col items-start">
+              <span className="text-xs uppercase font-bold text-gray-500 mb-1 tracking-widest">Appels</span>
+              <a href={`tel:${contactInfo.call.replace(/\s/g, '')}`} className="text-white font-bold hover:text-[#1da1b5] transition-colors">{contactInfo.call}</a>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-xs uppercase font-bold text-gray-500 mb-1 tracking-widest">WhatsApp</span>
+              <a href={`https://wa.me/${contactInfo.whatsapp.replace(/\s/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-white font-bold hover:text-[#25D366] transition-colors">{contactInfo.whatsapp}</a>
+            </div>
+          </div>
+          <p>© {new Date().getFullYear()} AlphaDesign. Tous droits réservés.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
