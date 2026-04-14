@@ -1,69 +1,42 @@
 # portefolio
 
-## Installation et lancement
+## Site vitrine statique
+
+Ce projet est maintenant un site vitrine statique créé avec React et Vite. Il n’utilise plus de backend Express ni de base de données SQLite.
+
+## Installation
 
 1. Installez les dépendances :
    ```bash
    npm install
    ```
-2. Copiez le fichier `.env.example` vers `.env` si vous avez besoin de définir une URL de l’API ou une origine autorisée :
-   ```bash
-   cp .env.example .env
-   ```
-3. Pour le développement :
+
+## Développement
+
+1. Lancez le serveur de développement :
    ```bash
    npm run dev
    ```
-4. Pour un déploiement local en production :
+2. Ouvre `http://localhost:5173`
+
+## Production
+
+1. Construisez le site :
    ```bash
-   npm run serve
+   npm run build
+   ```
+2. Prévisualisez la version de production :
+   ```bash
+   npm run preview
    ```
 
-> Ne pas ouvrir `main.html` directement dans le navigateur : l’application React fonctionne à partir de `http://localhost:4000/` après `npm run serve`.
+## Déploiement
 
-## Routes
-
-- Frontend : `http://localhost:4000`
-- API de contact : `POST http://localhost:4000/api/messages`
-- Liste des messages : `GET http://localhost:4000/api/messages`
+- Le site peut être déployé sur un hébergement statique comme GitHub Pages, Netlify, Vercel ou Render (Static Site).
+- Le dossier public de production est `dist/`.
 
 ## Notes
 
-- Le backend sert maintenant l’application React construite avec Vite.
-- Les messages de contact sont sauvegardés dans `database.sqlite`.
-- `dist/` est ignoré et généré lors du build.
-
-
-## Backend de stockage des messages
-
-Cette version ajoute un backend Node.js avec SQLite pour enregistrer les messages du formulaire de contact.
-
-### Démarrage
-
-1. Installez les dépendances :
-   ```bash
-   npm install
-   ```
-2. Lancez le serveur :
-   ```bash
-   npm start
-   ```
-3. Assurez-vous que le serveur tourne sur `http://localhost:4000`.
-
-## Déploiement sur GitHub Pages
-
-Le site peut être déployé automatiquement sur GitHub Pages en utilisant le workflow GitHub Actions présent dans `.github/workflows/gh-pages.yml`.
-
-1. Poussez votre branche `main` vers GitHub.
-2. Activez GitHub Pages dans les paramètres du dépôt :
-   - Source : `gh-pages` branch
-   - Dossier : `/`
-3. Le workflow va construire le site et publier le dossier `dist/` sur la branche `gh-pages`.
-
-> Note : cette configuration publie uniquement le frontend statique. Le backend Express/SQLite n’est pas hébergé par GitHub Pages.
-
-### Fonctionnement
-
-- Le formulaire de contact de `main.html` envoie les messages à `/api/messages`.
-- Les messages sont sauvegardés dans `database.sqlite`.
-- Vous pouvez consulter tous les messages via `GET /api/messages`.
+- Le site utilise maintenant uniquement le frontend React.
+- Il n’y a plus d’API `/api` ni de stockage SQLite.
+- Les boutons de contact utilisent WhatsApp pour les demandes et commandes.
