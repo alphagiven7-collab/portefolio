@@ -21,10 +21,13 @@ export default function App() {
   const [selectedService, setSelectedService] = useState('Site Vitrine');
 
   const contactInfo = {
-    whatsapp: '0845370370',
+    // Mise à jour du numéro WhatsApp en format international.
+    whatsapp: '+243845370370',
     call: '0836104745',
     email: 'Alphagiven7@gmail.com',
   };
+
+  const whatsappNumber = contactInfo.whatsapp.replace(/\D/g, '');
 
   const colors = {
     primary: '#1da1b5',
@@ -52,7 +55,6 @@ export default function App() {
     }
   };
 
-  const whatsappNumber = contactInfo.whatsapp.replace(/\s/g, '');
   const whatsappOrderLink = (service) => {
     const text = `Bonjour, je souhaite passer une commande pour : ${service}. Merci de me contacter sur WhatsApp pour finaliser.`;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
@@ -312,7 +314,7 @@ export default function App() {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-3 rounded-full bg-[#25D366] px-10 py-4 text-lg font-bold text-white shadow-lg transition-colors hover:bg-[#1ebe5b]"
             >
-              Commander / Contacter sur WhatsApp <MessageCircle size={24} />
+              Contacter sur WhatsApp <MessageCircle size={24} />
             </a>
             <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
               <div className="rounded-3xl border border-gray-200 p-6">
